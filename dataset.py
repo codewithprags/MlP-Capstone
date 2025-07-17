@@ -4,18 +4,21 @@ from ucimlrepo import fetch_ucirepo
 
 
 """This script fetches the diabetes dataset from the UCI Machine Learning Repository"""
-#diabetes_130_us_hospitals_for_years_1999_2008 = fetch_ucirepo(id=296) 
+
   
-data (as pandas dataframes) 
-X = diabetes_130_us_hospitals_for_years_1999_2008.data.features 
-y = diabetes_130_us_hospitals_for_years_1999_2008.data.targets 
+from ucimlrepo import fetch_ucirepo 
   
- metadata 
-print(diabetes_130_us_hospitals_for_years_1999_2008.metadata) 
+# fetch dataset 
+cdc_diabetes_health_indicators = fetch_ucirepo(id=891) 
+  
+# data (as pandas dataframes) 
+X = cdc_diabetes_health_indicators.data.features 
+y = cdc_diabetes_health_indicators.data.targets 
+  
 
 #save as one combined csv
 combined_df = pd.concat([X, y], axis=1)
-combined_df.to_csv('diabetes_130_us_hospitals_combined.csv', index=False)
+combined_df.to_csv('diabetes_health_indicators.csv', index=False)
 
 
 
