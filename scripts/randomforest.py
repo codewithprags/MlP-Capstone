@@ -19,8 +19,8 @@ df = data.copy()
 
 # Apply the same preprocessing as MLP for fair comparison
 df = mlp.clean_data(df)
-df = mlp.scale_features(df)  # Random Forest doesn't strictly need scaling, but for consistency
-df = mlp.select_features(df)  # Use the same feature selection
+df = mlp.scale_features(df)  
+df = mlp.select_features(df)  
 
 print(f"Features selected: {list(df.columns)}")
 
