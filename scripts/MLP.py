@@ -86,7 +86,7 @@ def select_features(data, num_features=15, target_column='Diabetes_binary'):
 
     return new_df
 
-def train_mlp(data, target_column='Diabetes_binary', test_size=0.2, random_state=42):
+def train_mlp(data, target_column='Diabetes_binary', test_size=0.2, random_state=42, hidden_layers=(64, 32), max_iter=100):
     # Split the data into features and target variable
     df = data.copy()
     X = df.drop(columns=[target_column])
@@ -96,10 +96,11 @@ def train_mlp(data, target_column='Diabetes_binary', test_size=0.2, random_state
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
     # Create and train the MLP classifier
-    mlp = MLPClassifier(hidden_layer_sizes=(64,32),
+    mlp = MLPClassifier(hidden_layer_sizes=hidden_layers,
                         activation='relu',
                         solver='adam',
-                        max_iter=100,
+                        max_iter=max_iter,
+                        alpha=0.001,
                         batch_size=32,
                         learning_rate_init=0.001,
                         early_stopping=True,
@@ -116,4 +117,58 @@ def train_mlp(data, target_column='Diabetes_binary', test_size=0.2, random_state
     print(confusion_matrix(y_test, y_pred))
 
     return mlp
+
+
+def visualize_results(model, data, target_column='Diabetes_binary'):
+    # Visualize the results with AUROC and PR curves
+    from sklearn.metrics import roc_curve, auc, precision_recall_curve
+    from sklearn.metrics import RocCurveDisplay, PrecisionRecallDisplay
+
+    # Separate features and target variable
+    df = data.copy()
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
+
+    # Get predicted probabilities
+    y_scores = model.predict_proba(X)[:, 1]
+
+    # Compute ROC curve and ROC area
+    fpr, tpr, _ = roc_curve(y, y_scores)
+    roc_auc = auc(fpr, tpr)
+
+    # Compute Precision-Recall curve
+    precision, recall, _ = precision_recall_curve(y, y_scores)
+
+    # Plot ROC curve
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.plot(fpr, tpr, color='blue', label='ROC curve (area = {:.2f})'.format(roc_auc))
+    plt.plot([0, 1], [0, 1], color='red', linestyle='--')
+    plt.title('Receiver Operating Characteristic (ROC)')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.legend(loc='lower right')
+
+    # Plot Precision-Recall curve
+    plt.subplot(1, 2, 2)
+    plt.plot(recall, precision, color='green')
+    plt.title('Precision-Recall Curve')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+
+    plt.tight_layout()
+    plt.show()
+
+
+def check_balance_data(data, target_column='Diabetes_binary'):
+    # Check the balance of the target variable
+    class_counts = data[target_column].value_counts()
+    print(f"Class distribution in the dataset:\n{class_counts}")
+    
+    # Plot the class distribution
+    sns.countplot(x=target_column, data=data)
+    plt.title('Class Distribution')
+    plt.xlabel(target_column)
+    plt.ylabel('Count')
+    plt.show()
 
