@@ -121,16 +121,23 @@ def train_mlp(data, target_column='Diabetes_binary', test_size=0.2, random_state
 
 def visualize_results(model, data, target_column='Diabetes_binary'):
     # Visualize the results with AUROC and PR curves
-    from sklearn.metrics import roc_curve, auc, precision_recall_curve
-    from sklearn.metrics import RocCurveDisplay, PrecisionRecallDisplay
+    from sklearn.metrics import roc_curve, auc, precision_recall_curve, accuracy_score, precision_score, recall_score
 
     # Separate features and target variable
     df = data.copy()
     X = df.drop(columns=[target_column])
     y = df[target_column]
 
-    # Get predicted probabilities
+    # Get predictions and probabilities
+    y_pred = model.predict(X)
     y_scores = model.predict_proba(X)[:, 1]
+    minor_class = y.mean()  # Calculate the minority class proportion for the PR baseline
+    
+    # Calculate performance metrics
+    accuracy = accuracy_score(y, y_pred)
+    precision_avg = precision_score(y, y_pred, average='binary')
+    recall_avg = recall_score(y, y_pred, average='binary')
+    f1_score = 2*(precision_avg*recall_avg)/(precision_avg+recall_avg)
 
     # Compute ROC curve and ROC area
     fpr, tpr, _ = roc_curve(y, y_scores)
@@ -139,25 +146,46 @@ def visualize_results(model, data, target_column='Diabetes_binary'):
     # Compute Precision-Recall curve
     precision, recall, _ = precision_recall_curve(y, y_scores)
 
+    # Create figure with subplots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
     # Plot ROC curve
-    plt.figure(figsize=(12, 6))
-    plt.subplot(1, 2, 1)
-    plt.plot(fpr, tpr, color='blue', label='ROC curve (area = {:.2f})'.format(roc_auc))
-    plt.plot([0, 1], [0, 1], color='red', linestyle='--')
-    plt.title('Receiver Operating Characteristic (ROC)')
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.legend(loc='lower right')
+    ax1.plot(fpr, tpr, color='blue', label=f'ROC (AUC = {roc_auc:.3f})')
+    ax1.plot([0, 1], [0, 1], color='red', linestyle='--', label='Random')
+    ax1.set_title('ROC Curve - MLP Classifier')
+    ax1.set_xlabel('False Positive Rate')
+    ax1.set_ylabel('True Positive Rate')
+    ax1.legend(loc='lower right')
+    ax1.grid(True, alpha=0.3)
 
     # Plot Precision-Recall curve
-    plt.subplot(1, 2, 2)
-    plt.plot(recall, precision, color='green')
-    plt.title('Precision-Recall Curve')
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
+    ax2.plot(recall, precision, color='green', label=f'PR Curve')
+    ax2.axhline(y=minor_class, color='red', lw=2, linestyle='--', label=f'Random (y={minor_class:.3f})')
+    ax2.set_title('Precision-Recall Curve - MLP Classifier')
+    ax2.set_xlabel('Recall')
+    ax2.set_ylabel('Precision')
+    ax2.legend(loc='lower left')
+    ax2.grid(True, alpha=0.3)
+
+    # Add metrics text box in the middle-right area
+    metrics_text = f"""Model Performance:
+Accuracy: {accuracy:.3f}
+Precision: {precision_avg:.3f}
+Recall: {recall_avg:.3f}
+F1-Score: {f1_score:.3f}
+AUC: {roc_auc:.3f}"""
+    
+    # Position the text box to overlay in the top right corner
+    fig.text(0.85, 0.85, metrics_text, 
+             bbox=dict(boxstyle="round,pad=0.5", facecolor="lightblue", alpha=0.9, edgecolor='navy'),
+             fontsize=10, ha='center', va='top',
+             transform=fig.transFigure, zorder=10)
 
     plt.tight_layout()
-    plt.show()
+    
+    # Don't show immediately - let caller decide when to show/save
+    # plt.show()
+    return plt.gcf()  # Return the figure object
 
 
 def check_balance_data(data, target_column='Diabetes_binary'):

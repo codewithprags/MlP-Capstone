@@ -1,18 +1,29 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    accuracy_score, roc_curve, auc,
-    precision_recall_curve, average_precision_score
-)
+from sklearn.metrics import (accuracy_score, roc_curve, auc, precision_recall_curve, average_precision_score)
 from sklearn.model_selection import train_test_split
+import MLP as mlp
+import testing as test
 
 # Load dataset
-df = pd.read_csv("diabetes_binary_health_indicators_BRFSS2015.csv")
+data = pd.read_csv(r"d:\VSCode ProjectsRepos\MlP-Capstone\data\diabetes_health_indicators.csv")
 
-# Prepare features and target
-X = df.drop(columns=["Diabetes_binary"])
-y = df["Diabetes_binary"]
+# Clean and preprocess the data
+df = data.copy()
+
+
+df = mlp.clean_data(df)
+df = mlp.scale_features(df)  
+df = mlp.select_features(df)
+
+df_balanced = test.fix_oversampling(df)
+
+
+
+# Prepare features and target from balanced data
+X = df_balanced.drop(columns=["Diabetes_binary"])
+y = df_balanced["Diabetes_binary"]
 
 # Calculate the minority class proportion for the PR baseline
 minority_class = y.mean()
@@ -45,7 +56,7 @@ axes[0].plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = %0.2f)'
 axes[0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Guess')
 axes[0].set_xlabel('False Positive Rate')
 axes[0].set_ylabel('True Positive Rate')
-axes[0].set_title('ROC Curve')
+axes[0].set_title('ROC Curve-Logistic Regression')
 axes[0].legend(loc='lower right')
 
 # Plot Precision-Recall curve
@@ -53,9 +64,12 @@ axes[1].plot(recall, precision, color='purple', lw=2, label='Precision-Recall cu
 axes[1].plot([0, 1], [minority_class, minority_class], color='navy', lw=2, linestyle='--', label='Random Guess')
 axes[1].set_xlabel('Recall')
 axes[1].set_ylabel('Precision')
-axes[1].set_title('Precision-Recall Curve')
+axes[1].set_title('Precision-Recall Curve-Logistic Regression')
 axes[1].legend(loc='lower left')
 
 # Adjust layout and show the plot
 plt.tight_layout()
 plt.show()
+
+#save the figure
+plt.savefig(r'd:\VSCode ProjectsRepos\MlP-Capstone\figures\logistic_regression_evaluation.png', dpi=300, bbox_inches='tight')
