@@ -48,6 +48,13 @@ roc_auc = auc(fpr, tpr)
 precision, recall, _ = precision_recall_curve(y_test, y_scores)
 average_precision = average_precision_score(y_test, y_scores)
 
+print(f"ROC AUC: {roc_auc:.2f}")
+print(f"Accuracy: {accuracy_score(y_test, log_reg.predict(X_test)):.2f}")
+print(f"Precision: {precision.mean():.2f}")
+print(f"Recall: {recall.mean():.2f}")
+print(f"F1 Score: {2 * (precision.mean() * recall.mean()) / (precision.mean() + recall.mean()):.2f}")
+
+
 # Plot ROC curve and Precision-Recall curve as subplots on the same figure
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
