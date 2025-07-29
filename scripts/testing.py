@@ -26,7 +26,7 @@ diabetes_data = pd.read_csv(r"d:\VSCode ProjectsRepos\MlP-Capstone\data\diabetes
 
 
 
-
+#model to test the MLP on various configurations and see the impact of balancing and feature selection
 def train_mlp_balanced(data, target_column='Diabetes_binary', test_size=0.2, random_state=42, 
                                 hidden_layers=(64, 32), max_iter=100):
     
@@ -93,7 +93,7 @@ def fix_oversampling(data, target_column='Diabetes_binary'):
     
     return balanced_data
 
-
+#testing the models below (commented out to avoid running during import)
 #clean_data = fix_oversampling(clean_data)
 #trained_model2 = train_mlp_balanced(clean_data)
 #print("Model training completed successfully!")
