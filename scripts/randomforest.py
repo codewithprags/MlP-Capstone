@@ -38,18 +38,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 
 # Train Random Forest model
-print("\n" + "="*60)
-print("TRAINING RANDOM FOREST MODEL")
-print("="*60)
-
 print("\nTraining Default Random Forest...")
 rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
 rf_model.fit(X_train, y_train)
 
-# Evaluate the model
-print("\n" + "="*60)
-print("MODEL EVALUATION RESULTS")
-print("="*60)
 
 print(f"\nRandom Forest Results:")
 print("-" * 30)
@@ -74,7 +66,7 @@ average_precision = average_precision_score(y_test, y_scores)
 
 print(f"Accuracy: {accuracy:.3f}")
 print(f"Precision: {precision:.3f}")
-print(f"Recall: {recall:.3f} ← Key metric for diabetes detection")
+print(f"Recall: {recall:.3f} ")
 print(f"F1 Score: {f1:.3f}")
 print(f"AUROC: {roc_auc:.3f}")
 print(f"AUPRC: {average_precision:.3f}")
@@ -85,7 +77,7 @@ minor_class = y_test.mean()
 # Create visualizations
 plt.figure(figsize=(15, 5))
 
-# ROC Curve
+# ROC Curve Plot
 plt.subplot(1, 3, 1)
 plt.plot(
     fpr,
@@ -102,7 +94,7 @@ plt.ylabel('True Positive Rate')
 plt.title('ROC Curve - Random Forest')
 plt.legend(loc="lower right")
 
-# Precision-Recall Curve
+# Precision-Recall Curve Plot
 plt.subplot(1, 3, 2)
 plt.plot(
     recall_curve,
@@ -117,7 +109,7 @@ plt.ylabel('Precision')
 plt.title('Precision-Recall Curve - Random Forest')
 plt.legend()
 
-# Confusion Matrix
+# Confusion Matrix plot
 plt.subplot(1, 3, 3)
 cm = confusion_matrix(y_test, y_pred)
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
@@ -141,10 +133,6 @@ importance_df = pd.DataFrame({
     'importance': feature_importance
 }).sort_values('importance', ascending=False)
 
-print(f"\nTOP 10 IMPORTANT FEATURES (Random Forest):")
-print("-" * 50)
-for i, (_, row) in enumerate(importance_df.head(10).iterrows(), 1):
-    print(f"{i:2d}. {row['feature']:25s} {row['importance']:.4f}")
 
 # Plot feature importance
 plt.figure(figsize=(12, 8))

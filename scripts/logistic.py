@@ -33,7 +33,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# Train a logistic regression model
+# Train a standard logistic regression model, to ensure we have a baseline and reproducibility
 log_reg = LogisticRegression(C=0.001, random_state=42, max_iter=1000)
 log_reg.fit(X_train, y_train)
 

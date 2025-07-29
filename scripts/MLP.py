@@ -72,7 +72,7 @@ def select_features(data, num_features=15, target_column='Diabetes_binary'):
     X = data.drop(columns=[target_column])
     y = data[target_column]
 
-    # Use SelectKBest to select the top features
+    # Use SelectKBest to select the top features using ANOVA F-test because it is suitable for classification tasks
     selector = SelectKBest(score_func=f_classif, k=num_features)
     X_new = selector.fit_transform(X, y)
 
@@ -87,7 +87,7 @@ def select_features(data, num_features=15, target_column='Diabetes_binary'):
     return new_df
 
 def train_mlp(data, target_column='Diabetes_binary', test_size=0.2, random_state=42, hidden_layers=(64, 32), max_iter=100):
-    # Split the data into features and target variable
+    # Split the cleaned data into features and target variable
     df = data.copy()
     X = df.drop(columns=[target_column])
     y = df[target_column]
@@ -96,15 +96,15 @@ def train_mlp(data, target_column='Diabetes_binary', test_size=0.2, random_state
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
     # Create and train the MLP classifier
-    mlp = MLPClassifier(hidden_layer_sizes=hidden_layers,
-                        activation='relu',
-                        solver='adam',
-                        max_iter=max_iter,
-                        alpha=0.001,
-                        batch_size=32,
-                        learning_rate_init=0.001,
-                        early_stopping=True,
-                        random_state=random_state)
+    mlp = MLPClassifier(hidden_layer_sizes=hidden_layers, #specify hidden layers
+                        activation='relu', #select activation function
+                        solver='adam',  #select solver 
+                        max_iter=max_iter, #specify max iterations
+                        alpha=0.001,  #regularization parameter
+                        batch_size=32, #specify batch size
+                        learning_rate_init=0.001, #initial learning rate
+                        early_stopping=True, #enable early stopping, helps with convergence
+                        random_state=random_state) #ensures reproducibility
     
     # Fit the model on the training data
     mlp.fit(X_train, y_train)
